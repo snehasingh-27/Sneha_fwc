@@ -1,0 +1,100 @@
+module seg7_driver (
+    input P1,       // Push button 1
+    input P2,       // Push button 2
+    output reg a,
+    output reg b,
+    output reg c,
+    output reg d,
+    output reg e,
+    output reg f,
+    output reg g
+);
+
+    always @(*) begin
+        case ({P1, P2})
+            2'b00: begin // Show 0
+                a = 1; b = 1; c = 1;
+                d = 1; e = 1; f = 1;
+                g = 0;
+            end
+            2'b10: begin // Show 2
+                a = 1; b = 1; c = 0;
+                d = 1; e = 1; f = 0;
+                g = 1;
+            end
+            2'b01: begin // Show 5
+                a = 1; b = 0; c = 1;
+                d = 1; e = 0; f = 1;
+                g = 1;
+            end
+            2'b11: begin // Show E (Error)
+                a = 1; b = 0; c = 0;
+                d = 1; e = 1; f = 1;
+                g = 1;
+            end
+            default: begin
+                a = 0; b = 0; c = 0;
+                d = 0; e = 0; f = 0;
+                g = 0;
+            end
+        endcase
+    end
+
+endmodule
+
+`timescale 1ns / 1ps
+
+module seg7_driver_tb;
+
+    // Inputs
+    reg P1;
+    reg P2;
+
+    // Outputs
+    wire a, b, c, d, e, f, g;
+
+    // Instantiate the Unit Under Test (UUT)
+    seg7_driver uut (
+        .P1(P1),
+        .P2(P2),
+        .a(a),
+        .b(b),
+        .c(c),
+        .d(d),
+        .e(e),
+        .f(f),
+        .g(g)
+    );
+
+    // Task to display outputs
+    task display_output;
+        begin
+            $display("P1=%b P2=%b => a=%b b=%b c=%b d=%b e=%b f=%b g=%b", 
+                      P1, P2, a, b, c, d, e, f, g);
+        end
+    endtask
+
+    initial begin
+        $display("Starting 7-Segment Display Driver Test...");
+
+        // Test case 0: P1=0, P2=0 => Show 0
+        P1 = 0; P2 = 0; #10;
+        display_output();
+
+        // Test case 1: P1=1, P2=0 => Show 2
+        P1 = 1; P2 = 0; #10;
+        display_output();
+
+        // Test case 2: P1=0, P2=1 => Show 5
+        P1 = 0; P2 = 1; #10;
+        display_output();
+
+        // Test case 3: P1=1, P2=1 => Show E
+        P1 = 1; P2 = 1; #10;
+        display_output();
+
+        $display("Test complete.");
+        $finish;
+    end
+
+endmodule
